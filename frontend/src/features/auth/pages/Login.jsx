@@ -32,7 +32,11 @@ const Login = () => {
 
 const redirect = searchParams.get("redirect");
 
-navigate(redirect || "/");
+if (redirect) {
+  navigate(redirect);
+} else {
+  navigate("/");
+}
     } catch (error) {
       setError(
         error.response?.data?.message || "Login failed. Please try again."

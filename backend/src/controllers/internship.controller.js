@@ -69,6 +69,34 @@ async function getAllInternship(req, res) {
     }
 }
 
+async function getMyInternships(req, res) {
+    try {
+        const companyId = req.user.id;
+
+        const internships = await internshipModel.find({
+            companyId
+        });
+
+        if (internships.length === 0) {
+            return res.status(200).json({
+                internships: [],
+                message: "No internships found"
+            });
+        }
+
+        return res.status(200).json({
+            internships,
+            message: "My internships fetched successfully"
+        });
+    }
+    catch (err) {
+        console.log("error in getMyInternships:", err);
+        return res.status(500).json({
+            message: "Internal Server Error"
+        });
+    }
+}
+
 async function getInternship(req, res) {
     try {
         const id = req.params.id;
@@ -236,4 +264,11 @@ async function deleteInternship(req, res) {
     }
 }
 
-module.exports = { createInternship, getAllInternship, getInternship, updateInternship, deleteInternship }
+module.exports = {
+    createInternship,
+    getAllInternship,
+    getMyInternships,
+    getInternship,
+    updateInternship,
+    deleteInternship
+}

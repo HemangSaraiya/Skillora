@@ -198,4 +198,66 @@ async function changeStatus(req, res) {
 
 }
 
-module.exports = { createApplication, myApplications, getInternshipApplicants ,changeStatus}
+async function getApplicationDetails(req, res) {
+    try {
+        const applicationId = req.params.applicationId;
+
+        if (!mongoose.Types.ObjectId.isValid(applicationId)) {
+            return res.status(400).json({
+                message: "Invalid application ID"
+            });
+        }
+
+        const application = await applicationModel
+            .findById(applicationId)
+            .populate("studentId", "name email");
+
+        if (!application) {
+            return res.status(404).json({
+                message: "Application not found"
+            });
+        }
+
+        // Find the internship
+        const internship = await internshipModel.findById(
+            application.internshipId
+        );
+
+        if (!internship) {
+            return res.status(404).json({
+                message: "Internship not found"
+            });
+        }
+
+        // Only the company that owns the internship can view
+        // the applicant's details
+        if (internship.companyId.toString() !== req.user.id) {
+            return res.status(403).json({
+                message: "You are not allowed to view this applicant"
+            });
+        }
+
+        // Find student's profile
+        const Profile = require("../models/profile.model");
+
+        const profile = await Profile.findOne({
+            userId: application.studentId._id
+        });
+
+        return res.status(200).json({
+            application,
+            student: application.studentId,
+            profile,
+            message: "Applicant details fetched successfully"
+        });
+    }
+    catch (err) {
+        console.log("getApplicationDetails error", err);
+
+        return res.status(500).json({
+            message: "Internal Server Error"
+        });
+    }
+}
+
+module.exports = { createApplication, myApplications, getInternshipApplicants ,changeStatus,getApplicationDetails}

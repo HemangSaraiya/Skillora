@@ -32,6 +32,7 @@ const Navbar = () => {
         {/* Navigation */}
         <div className="hidden items-center gap-8 md:flex">
 
+          {/* Common Navigation */}
           <button
             onClick={() => navigate("/internships")}
             className="text-sm font-medium text-slate-600 transition hover:text-blue-600"
@@ -39,7 +40,8 @@ const Navbar = () => {
             Internships
           </button>
 
-          {user && user.role === "student" && (
+          {/* Student Navigation */}
+          {user?.role === "student" && (
             <>
               <button
                 onClick={() => navigate("/applications")}
@@ -64,9 +66,35 @@ const Navbar = () => {
             </>
           )}
 
+          {/* Company Navigation */}
+          {user?.role === "company" && (
+            <>
+              <button
+                onClick={() => navigate("/company/dashboard")}
+                className="text-sm font-medium text-slate-600 transition hover:text-blue-600"
+              >
+                Dashboard
+              </button>
+
+              <button
+                onClick={() => navigate("/company/my-internships")}
+                className="text-sm font-medium text-slate-600 transition hover:text-blue-600"
+              >
+                My Internships
+              </button>
+
+              <button
+                onClick={() => navigate("/company/internships/create")}
+                className="text-sm font-medium text-slate-600 transition hover:text-blue-600"
+              >
+                Post Internship
+              </button>
+            </>
+          )}
+
         </div>
 
-        {/* Right side */}
+        {/* Right Side */}
         <div className="flex items-center gap-3">
 
           {/* Search */}
@@ -80,7 +108,13 @@ const Navbar = () => {
             <>
               {/* User */}
               <button
-                onClick={() => navigate("/profile")}
+                onClick={() =>
+                  navigate(
+                    user.role === "company"
+                      ? "/company/dashboard"
+                      : "/profile"
+                  )
+                }
                 className="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 transition hover:bg-slate-50"
               >
                 <User size={18} />
