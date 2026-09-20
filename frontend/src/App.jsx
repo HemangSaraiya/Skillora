@@ -12,6 +12,7 @@ import CompanyDashboard from './features/company/pages/CompanyDashboard';
 import ManageInternship from './features/applications/pages/ManageInternship';
 import InternshipApplicants from './features/applications/pages/InternshipApplicants';
 import ApplicantProfile from './features/applications/pages/ApplicantProfile';
+import EditInternship from './features/internships/pages/EditInternship';
 
 const App = () => {
   return (
@@ -43,6 +44,10 @@ const App = () => {
         <Route
           path="/company/applications/:applicationId"
           element={<ApplicantProfile />}
+        />
+        <Route
+          path="/company/internships/:id/edit"
+          element={<EditInternship />}
         />
       </Routes>
     </BrowserRouter>

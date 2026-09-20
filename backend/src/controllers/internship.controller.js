@@ -51,11 +51,11 @@ async function getAllInternship(req, res) {
     try {
         const internships = await internshipModel.find({ status: "active" })
         if (internships.length === 0) {
-    return res.status(200).json({
-        internships: [],
-        message: "No internships available"
-    });
-}
+            return res.status(200).json({
+                internships: [],
+                message: "No internships available"
+            });
+        }
         return res.status(200).json({
             internships,
             message: "Internship fetched successfully"
@@ -105,8 +105,9 @@ async function getInternship(req, res) {
                 message: "Invalid internship ID"
             });
         }
-        const internship = await internshipModel.findById(id)
-        if (!internship || internship.status !== "active") {
+        const internship = await internshipModel.findById(id);
+
+        if (!internship) {
             return res.status(404).json({
                 message: "Internship not found"
             });
