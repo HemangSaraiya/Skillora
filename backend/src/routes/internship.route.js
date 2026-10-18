@@ -8,6 +8,12 @@ const router=express.Router()
 router.post('/',authMiddleware.verifyToken,roleMiddleware.roleMiddleware(["company","admin"]),internshipController.createInternship)
 router.get("/", internshipController.getAllInternship);
 router.get(
+    "/company-stats",
+    authMiddleware.verifyToken,
+    roleMiddleware.roleMiddleware(["company"]),
+    internshipController.getCompanyStats
+);
+router.get(
     "/my-internships",
     authMiddleware.verifyToken,
     roleMiddleware.roleMiddleware(["company"]),

@@ -265,11 +265,60 @@ async function deleteInternship(req, res) {
     }
 }
 
+async function getCompanyStats(req, res) {
+    try {
+        const companyId = req.user.id;
+
+        // Get all internships posted by this company
+        const internshipIds = await internshipModel.distinct("_id", {
+            companyId
+        });
+
+        // Calculate statistics
+        const [
+            activeInternships,
+            totalApplications,
+            pendingApplications
+        ] = await Promise.all([
+            internshipModel.countDocuments({
+                companyId,
+                status: "active"
+            }),
+
+            applicationModel.countDocuments({
+                internshipId: { $in: internshipIds }
+            }),
+
+            applicationModel.countDocuments({
+                internshipId: { $in: internshipIds },
+                status: "pending"
+            })
+        ]);
+
+        return res.status(200).json({
+            stats: {
+                totalInternships: internshipIds.length,
+                activeInternships,
+                totalApplications,
+                pendingApplications
+            },
+            message: "Company statistics fetched successfully"
+        });
+    }
+    catch (err) {
+        console.log("error in getCompanyStats:", err);
+        return res.status(500).json({
+            message: "Internal Server Error"
+        });
+    }
+}
+
 module.exports = {
     createInternship,
     getAllInternship,
     getMyInternships,
     getInternship,
     updateInternship,
-    deleteInternship
+    deleteInternship,
+    getCompanyStats
 }

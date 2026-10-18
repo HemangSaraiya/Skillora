@@ -13,7 +13,7 @@ import ManageInternship from './features/applications/pages/ManageInternship';
 import InternshipApplicants from './features/applications/pages/InternshipApplicants';
 import ApplicantProfile from './features/applications/pages/ApplicantProfile';
 import EditInternship from './features/internships/pages/EditInternship';
-
+import CreateInternship from "./features/internships/pages/CreateInternship";
 const App = () => {
   return (
     <BrowserRouter>
@@ -25,30 +25,13 @@ const App = () => {
         <Route path='/internships/:id' element={<InternshipDetails />} />
         <Route path="/internships/:id/apply" element={<ApplyInternship />} />
         <Route path='applications' element={<Applications />} />
-        <Route
-          path="/company/dashboard"
-          element={<CompanyDashboard />}
-        />
-        <Route
-          path="/company/my-internships"
-          element={<MyInternships />}
-        />
-        <Route
-          path="/company/internships/:id"
-          element={<ManageInternship />}
-        />
-        <Route
-          path="/company/internships/:id/applicants"
-          element={<InternshipApplicants />}
-        />
-        <Route
-          path="/company/applications/:applicationId"
-          element={<ApplicantProfile />}
-        />
-        <Route
-          path="/company/internships/:id/edit"
-          element={<EditInternship />}
-        />
+        <Route path="/company/dashboard" element={<CompanyDashboard />}/>
+        <Route path="/company/my-internships" element={<MyInternships />}/>
+        <Route path="/company/internships/:id" element={<ManageInternship />}/>
+        <Route path="/company/internships/:id/applicants" element={<InternshipApplicants />}/>
+        <Route path="/company/applications/:applicationId" element={<ApplicantProfile />}/>
+        <Route path="/company/internships/:id/edit" element={<EditInternship />}/>
+        <Route path='/company/internships/create' element={<CreateInternship />}/>
       </Routes>
     </BrowserRouter>
   )
