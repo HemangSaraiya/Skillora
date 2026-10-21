@@ -33,7 +33,7 @@ const App = () => {
         <Route path="/company/applications/:applicationId" element={<ApplicantProfile />}/>
         <Route path="/company/internships/:id/edit" element={<EditInternship />}/>
         <Route path='/company/internships/create' element={<CreateInternship />}/>
-        <Route path="/profile" element={<StudentProfile />} />
+        <Route path="student/profile" element={<StudentProfile />} />
       </Routes>
     </BrowserRouter>
   )
