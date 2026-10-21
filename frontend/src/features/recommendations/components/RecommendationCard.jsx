@@ -1,8 +1,10 @@
 import React from 'react'
 import { ArrowUpRight, MapPin, IndianRupee } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 const RecommendationCard = ({recommendation}) => {
     const { internship, score, matchedRequiredSkills, matchedPreferredSkills } =
     recommendation;
+      const navigate = useNavigate();
   return (
     <div>
       <div className="group rounded-2xl border border-slate-200 bg-white p-5 transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg">
@@ -86,7 +88,7 @@ const RecommendationCard = ({recommendation}) => {
           </p>
         </div>
 
-        <button className="flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition group-hover:bg-blue-600">
+        <button onClick={() => navigate(`/internships/${internship._id}`)} className="flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition group-hover:bg-blue-600">
           View Details
           <ArrowUpRight size={16} />
         </button>

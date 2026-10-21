@@ -11,12 +11,12 @@ const RecommendationList = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Wait until AuthContext finishes checking authentication
+
     if (authLoading) {
       return;
     }
 
-    // Only students should get recommendations
+
     if (!user || user.role !== "student") {
       setLoading(false);
       return;
@@ -43,13 +43,11 @@ const RecommendationList = () => {
     fetchRecommendations();
   }, [user, authLoading]);
 
-  // Don't show anything for logged-out users
-  // or non-student users.
   if (!authLoading && (!user || user.role !== "student")) {
     return null;
   }
 
-  // Auth is still loading
+
   if (authLoading || loading) {
     return (
       <section className="bg-white py-16">

@@ -14,6 +14,7 @@ import InternshipApplicants from './features/applications/pages/InternshipApplic
 import ApplicantProfile from './features/applications/pages/ApplicantProfile';
 import EditInternship from './features/internships/pages/EditInternship';
 import CreateInternship from "./features/internships/pages/CreateInternship";
+import StudentProfile from './features/profile/pages/StudentProfile';
 const App = () => {
   return (
     <BrowserRouter>
@@ -32,6 +33,7 @@ const App = () => {
         <Route path="/company/applications/:applicationId" element={<ApplicantProfile />}/>
         <Route path="/company/internships/:id/edit" element={<EditInternship />}/>
         <Route path='/company/internships/create' element={<CreateInternship />}/>
+        <Route path="/profile" element={<StudentProfile />} />
       </Routes>
     </BrowserRouter>
   )
