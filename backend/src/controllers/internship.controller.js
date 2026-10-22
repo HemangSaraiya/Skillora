@@ -47,27 +47,53 @@ async function createInternship(req, res) {
     }
 }
 
+
 async function getAllInternship(req, res) {
     try {
-        const internships = await internshipModel.find({ status: "active" })
-        if (internships.length === 0) {
-            return res.status(200).json({
-                internships: [],
-                message: "No internships available"
-            });
-        }
+        const page = Math.max(1, Number(req.query.page) || 1);
+        const limit = Math.min(
+            50,
+            Math.max(1, Number(req.query.limit) || 9)
+        );
+
+        const skip = (page - 1) * limit;
+
+        const filter = { status: "active" };
+
+        const totalInternships =
+            await internshipModel.countDocuments(filter);
+
+        const totalPages = Math.ceil(totalInternships / limit);
+
+        const internships = await internshipModel
+            .find(filter)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
         return res.status(200).json({
             internships,
-            message: "Internship fetched successfully"
-        })
-    }
-    catch (err) {
+            pagination: {
+                currentPage: page,
+                limit,
+                totalInternships,
+                totalPages,
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1
+            },
+            message: internships.length === 0
+                ? "No internships available"
+                : "Internship fetched successfully"
+        });
+    } catch (err) {
         console.log("error in getAllInternship:", err);
+
         return res.status(500).json({
             message: "Internal Server Error"
-        })
+        });
     }
 }
+
 
 async function getMyInternships(req, res) {
     try {

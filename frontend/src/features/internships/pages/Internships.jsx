@@ -57,13 +57,14 @@ const Internships = () => {
   const [workMode, setWorkMode] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [filtersOpen, setFiltersOpen] = useState(false);
+const [currentPage, setCurrentPage] = useState(1);
 
-
+const [pagination, setPagination] = useState(null);
   useEffect(() => {
     setSearch(searchParams.get("search") || "");
   }, [searchParams]);
 
-  // Update the URL as the search changes, without adding a history entry per keystroke.
+ 
   useEffect(() => {
     const nextParams = new URLSearchParams(searchParams);
     const value = search.trim();
@@ -77,21 +78,27 @@ const Internships = () => {
   }, [search, searchParams, setSearchParams]);
 
   const fetchInternships = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError("");
-      const data = await getAllInternships();
-      setInternships(Array.isArray(data?.internships) ? data.internships : []);
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
+  try {
+    setLoading(true);
+    setError("");
+
+    const data = await getAllInternships(currentPage, 9);
+
+    setInternships(
+      Array.isArray(data?.internships) ? data.internships : []
+    );
+
+    setPagination(data?.pagination ?? null);
+  } catch (err) {
+    setError(
+      err.response?.data?.message ||
         err.message ||
         "We couldn't load internships. Please check your connection and try again."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    );
+  } finally {
+    setLoading(false);
+  }
+}, [currentPage]);
 
   useEffect(() => {
     fetchInternships();
@@ -406,13 +413,56 @@ const Internships = () => {
               </div>
             )}
 
-            {!loading && !error && filteredInternships.length > 0 && (
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredInternships.map((internship) => (
-                  <InternshipCard key={internship._id} internship={internship} />
-                ))}
-              </div>
-            )}
+            {!loading && !error && internships.length > 0 && (
+  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    {internships.map((internship) => (
+      <InternshipCard
+        key={internship._id}
+        internship={internship}
+      />
+    ))}
+  </div>
+)}
+
+{!loading && !error && pagination && pagination.totalPages > 0 && (
+  <>
+    <div className="mt-8 flex items-center justify-center gap-4">
+      <button
+        type="button"
+        disabled={!pagination.hasPreviousPage}
+        onClick={() => setCurrentPage((page) => page - 1)}
+        className="rounded-lg border px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Previous
+      </button>
+
+      <span className="text-sm text-slate-600">
+        Page {pagination.currentPage} of {pagination.totalPages}
+      </span>
+
+      <button
+        type="button"
+        disabled={!pagination.hasNextPage}
+        onClick={() => setCurrentPage((page) => page + 1)}
+        className="rounded-lg border px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Next
+      </button>
+    </div>
+
+    <p className="mt-4 text-center text-sm text-slate-500">
+      Showing{" "}
+      {(pagination.currentPage - 1) * pagination.limit + 1}
+      {"–"}
+      {Math.min(
+        pagination.currentPage * pagination.limit,
+        pagination.totalInternships
+      )}
+      {" of "}
+      {pagination.totalInternships} internships
+    </p>
+  </>
+)}
 
             {!loading && !error && filteredInternships.length === 0 && (
               <div className="rounded-3xl border border-dashed border-slate-300 bg-white px-5 py-14 text-center sm:px-10">
