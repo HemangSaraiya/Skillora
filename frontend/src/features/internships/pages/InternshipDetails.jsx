@@ -147,14 +147,14 @@ const InternshipDetails = () => {
             <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
               <button
                 onClick={() => setRetryKey((value) => value + 1)}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
               >
                 <RefreshCw size={16} />
                 Try again
               </button>
               <button
                 onClick={() => navigate("/internships")}
-                className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="cursor-pointer rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
                 Browse internships
               </button>
@@ -177,7 +177,7 @@ const InternshipDetails = () => {
           <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
             <button
               onClick={() => navigate("/internships")}
-              className="mb-8 inline-flex items-center gap-2 rounded-lg text-sm font-medium text-slate-500 transition hover:text-blue-700"
+              className="mb-8 inline-flex cursor-pointer items-center gap-2 rounded-lg text-sm font-medium text-slate-500 transition hover:text-blue-700"
             >
               <ArrowLeft size={17} />
               All internships
@@ -221,7 +221,7 @@ const InternshipDetails = () => {
                 <button
                   onClick={() => navigate(`/internships/${id}/apply`)}
                   disabled={Boolean(deadlinePassed)}
-                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                  className="mt-5 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                 >
                   {deadlinePassed ? "Applications closed" : "Apply now"}
                   {!deadlinePassed && <ArrowUpRight size={17} />}
@@ -407,7 +407,7 @@ const InternshipDetails = () => {
                 <button
                   onClick={() => navigate(`/internships/${id}/apply`)}
                   disabled={Boolean(deadlinePassed)}
-                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="mt-5 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {deadlinePassed ? "Applications closed" : "Apply for this internship"}
                   {!deadlinePassed && <ArrowUpRight size={16} />}
