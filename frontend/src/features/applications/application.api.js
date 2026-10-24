@@ -10,9 +10,11 @@ export const getMyApplications = async () => {
   return response.data;
 };
 
-export const getInternshipApplicants = async (internshipId) => {
+export const getInternshipApplicants = async (internshipId,page = 1, limit = 5) => {
   const response = await api.get(
-    `/application/internship/${internshipId}`
+    `/application/internship/${internshipId}`,{
+      params:{page,limit}
+    }
   );
   return response.data;
 };

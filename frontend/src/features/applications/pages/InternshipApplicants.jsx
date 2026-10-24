@@ -17,7 +17,7 @@ import {
   XCircle,
 } from "lucide-react";
 import api from "../../../services/axios";
-
+import { getInternshipApplicants } from "../application.api";
 const statusStyles = {
   pending: "border-amber-200 bg-amber-50 text-amber-700",
   shortlisted: "border-sky-200 bg-sky-50 text-sky-700",
@@ -67,18 +67,25 @@ const InternshipApplicants = () => {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-
+  const [currentPage, setCurrentPage] = useState(1);
+const [pagination, setPagination] = useState(null);
   const fetchApplicants = useCallback(async (isRefresh = false) => {
     try {
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
       setError("");
 
-      const response = await api.get(`/application/internship/${id}`);
-      setApplicants(response.data.applicants || []);
+     const data = await getInternshipApplicants(id, currentPage, 5);
+
+    setApplicants(
+      Array.isArray(data?.applicants) ? data.applicants : []
+    );
+
+    setPagination(data?.pagination ?? null);
     } catch (err) {
       if (err.response?.status === 404) {
         setApplicants([]);
+        setPagination(null);
       } else {
         setError(err.response?.data?.message || "Failed to fetch applicants. Please try again.");
       }
@@ -86,7 +93,7 @@ const InternshipApplicants = () => {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [id]);
+  }, [currentPage,id]);
 
   useEffect(() => {
     fetchApplicants();
@@ -161,7 +168,7 @@ const InternshipApplicants = () => {
               </div>
               <div>
                 <p className="text-xs text-slate-400">Applications received</p>
-                <p className="text-2xl font-bold">{counts.total}</p>
+                <p className="text-2xl font-bold">{pagination.totalApplicants}</p>
               </div>
             </div>
           </div>
@@ -182,10 +189,10 @@ const InternshipApplicants = () => {
 
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            { label: "Pending review", value: counts.pending, icon: Clock3, tone: "text-amber-600 bg-amber-50" },
-            { label: "Shortlisted", value: counts.shortlisted, icon: Users, tone: "text-sky-600 bg-sky-50" },
-            { label: "Accepted", value: counts.accepted, icon: CheckCircle2, tone: "text-emerald-600 bg-emerald-50" },
-            { label: "Rejected", value: counts.rejected, icon: XCircle, tone: "text-rose-600 bg-rose-50" },
+            { label: "Pending review", value: pagination.totalPending, icon: Clock3, tone: "text-amber-600 bg-amber-50" },
+            { label: "Shortlisted", value: pagination.totalShortlisted, icon: Users, tone: "text-sky-600 bg-sky-50" },
+            { label: "Accepted", value: pagination.totalAccepted, icon: CheckCircle2, tone: "text-emerald-600 bg-emerald-50" },
+            { label: "Rejected", value: pagination.totalRejected, icon: XCircle, tone: "text-rose-600 bg-rose-50" },
           ].map(({ label, value, icon: Icon, tone }) => (
             <div key={label} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
               <div className={`mb-3 flex h-9 w-9 items-center justify-center rounded-xl ${tone}`}><Icon size={18} /></div>
@@ -209,7 +216,7 @@ const InternshipApplicants = () => {
             </div>
             <div className="flex flex-wrap items-center gap-2">
               {[
-                ["all", `All (${counts.total})`],
+                ["all", `All (${pagination.totalApplicants})`],
                 ["pending", "Pending"],
                 ["shortlisted", "Shortlisted"],
                 ["accepted", "Accepted"],
@@ -306,6 +313,48 @@ const InternshipApplicants = () => {
             })}
           </div>
         )}
+        {!loading && !error && pagination && pagination.totalPages > 0 && (
+  <>
+    <div className="mt-8 flex items-center justify-center gap-4">
+      <button
+        type="button"
+        disabled={!pagination.hasPreviousPage}
+        onClick={() => setCurrentPage((page) => page - 1)}
+        className="rounded-lg border px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Previous
+      </button>
+
+      <span className="text-sm text-slate-600">
+        Page {pagination.currentPage} of {pagination.totalPages}
+      </span>
+
+      <button
+        type="button"
+        disabled={!pagination.hasNextPage}
+        onClick={() => setCurrentPage((page) => page + 1)}
+        className="rounded-lg border px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Next
+      </button>
+    </div>
+
+    <p className="mt-4 text-center text-sm text-slate-500">
+  Showing{" "}
+  {Math.min(
+    (pagination.currentPage - 1) * pagination.limit + 1,
+    pagination.totalApplicants
+  )}
+  {"–"}
+  {Math.min(
+    pagination.currentPage * pagination.limit,
+    pagination.totalApplicants
+  )}
+  {" of "}
+  {pagination.totalApplicants} applicants
+</p>
+  </>
+)}
       </div>
     </div>
   );

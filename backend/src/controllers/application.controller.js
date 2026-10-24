@@ -120,13 +120,20 @@ async function getInternshipApplicants(req, res) {
         const totalApplicants=await applicationModel.countDocuments({internshipId });
         const totalPages=Math.ceil(totalApplicants / limit);
         const applicants = await applicationModel.find({ internshipId }).populate("studentId").limit(limit).skip(skip)
-        
+        const totalPending=await applicationModel.countDocuments({internshipId,status:"pending"})
+        const totalShortlisted=await applicationModel.countDocuments({internshipId,status:"shortlisted"})
+        const totalAccepted=await applicationModel.countDocuments({internshipId,status:"accepted"})
+        const totalRejected=await applicationModel.countDocuments({internshipId,status:"rejected"})
         return res.status(200).json({
             applicants,
              pagination: {
                 currentPage: page,
                 limit,
                 totalApplicants,
+                totalPending,
+                totalShortlisted,
+                totalAccepted,
+                totalRejected,
                 totalPages,
                 hasNextPage: page < totalPages,
                 hasPreviousPage: page > 1
