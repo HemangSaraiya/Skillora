@@ -87,17 +87,25 @@ async function myApplications(req, res) {
 
 async function getInternshipApplicants(req, res) {
     try {
+        const page = Math.max(1, Number(req.query.page) || 1);
+        const limit = Math.min(
+            50,
+            Math.max(1, Number(req.query.limit) || 5)
+        );
+
+        const skip = (page - 1) * limit;
         const internshipId = req.params.internshipId
+         if (!internshipId) {
+            return res.status(400).json({
+                message: "Internship ID is required"
+            });
+        }
         if (!mongoose.Types.ObjectId.isValid(internshipId)) {
             return res.status(400).json({
                 message: "Invalid internship ID"
             });
         }
-        if (!internshipId) {
-            return res.status(400).json({
-                message: "Internship ID is required"
-            });
-        }
+       
         const internship = await internshipModel.findById(internshipId);
         if (!internship) {
             return res.status(404).json({
@@ -109,14 +117,20 @@ async function getInternshipApplicants(req, res) {
                 message: "You are not allowed to view these applicants"
             });
         }
-        const applicants = await applicationModel.find({ internshipId }).populate("studentId")
-        if (applicants.length === 0) {
-            return res.status(404).json({
-                message: "No applicants found"
-            })
-        }
+        const totalApplicants=await applicationModel.countDocuments({internshipId });
+        const totalPages=Math.ceil(totalApplicants / limit);
+        const applicants = await applicationModel.find({ internshipId }).populate("studentId").limit(limit).skip(skip)
+        
         return res.status(200).json({
             applicants,
+             pagination: {
+                currentPage: page,
+                limit,
+                totalApplicants,
+                totalPages,
+                hasNextPage: page < totalPages,
+                hasPreviousPage: page > 1
+            },
             message: "Applicants found successfully"
         })
     }

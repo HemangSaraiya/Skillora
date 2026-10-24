@@ -47,7 +47,9 @@ async function createInternship(req, res) {
     }
 }
 
-
+function escapeRegex(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 async function getAllInternship(req, res) {
     try {
         const page = Math.max(1, Number(req.query.page) || 1);
@@ -58,16 +60,58 @@ async function getAllInternship(req, res) {
 
         const skip = (page - 1) * limit;
 
-        const filter = { status: "active" };
+        const { search, domain, workMode, sortBy } = req.query;
 
+const filter = { status: "active" };
+
+
+
+if (workMode && workMode !== "all") {
+  filter.workMode = workMode;
+}
+if (search && search.trim()) {
+    const searchRegex = new RegExp(escapeRegex(search.trim()),
+        "i");
+
+    filter.$or = [
+        { title: searchRegex },
+        { description: searchRegex },
+        { domain: searchRegex },
+        { location: searchRegex },
+        { requiredSkills: searchRegex },
+        { preferredSkills: searchRegex }
+    ];
+}
         const totalInternships =
             await internshipModel.countDocuments(filter);
 
         const totalPages = Math.ceil(totalInternships / limit);
+        let sortOption = { createdAt: -1 };
 
+switch (sortBy) {
+    case "oldest":
+        sortOption = { createdAt: 1 };
+        break;
+
+    case "title-asc":
+        sortOption = { title: 1 };
+        break;
+
+    case "stipend-high":
+        sortOption = { "stipend.amount": -1 };
+        break;
+
+    case "stipend-low":
+        sortOption = { "stipend.amount": 1 };
+        break;
+
+    case "newest":
+    default:
+        sortOption = { createdAt: -1 };
+}
         const internships = await internshipModel
             .find(filter)
-            .sort({ createdAt: -1 })
+            .sort(sortOption)
             .skip(skip)
             .limit(limit);
 

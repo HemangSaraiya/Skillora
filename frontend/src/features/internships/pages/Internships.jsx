@@ -53,6 +53,7 @@ const Internships = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
   const [domain, setDomain] = useState("all");
   const [workMode, setWorkMode] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
@@ -63,7 +64,9 @@ const [pagination, setPagination] = useState(null);
   useEffect(() => {
     setSearch(searchParams.get("search") || "");
   }, [searchParams]);
-
+useEffect(() => {
+    setCurrentPage(1);
+}, [search, workMode, sortBy]);
  
   useEffect(() => {
     const nextParams = new URLSearchParams(searchParams);
@@ -82,7 +85,11 @@ const [pagination, setPagination] = useState(null);
     setLoading(true);
     setError("");
 
-    const data = await getAllInternships(currentPage, 9);
+    const data = await getAllInternships(currentPage, 9, {
+            search:debouncedSearch,
+            workMode,
+            sortBy
+        });
 
     setInternships(
       Array.isArray(data?.internships) ? data.internships : []
@@ -98,7 +105,7 @@ const [pagination, setPagination] = useState(null);
   } finally {
     setLoading(false);
   }
-}, [currentPage]);
+}, [currentPage,debouncedSearch, workMode, sortBy]);
 
   useEffect(() => {
     fetchInternships();
@@ -165,9 +172,15 @@ const [pagination, setPagination] = useState(null);
 
   const removeFilter = (filter) => {
     if (filter === "search") setSearch("");
-    if (filter === "domain") setDomain("all");
     if (filter === "workMode") setWorkMode("all");
   };
+  useEffect(() => {
+    const timer = setTimeout(() => {
+        setDebouncedSearch(search);
+    }, 400);
+
+    return () => clearTimeout(timer);
+}, [search]);
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Navbar />
@@ -209,7 +222,7 @@ const [pagination, setPagination] = useState(null);
                 </div>
                 <div>
                   <p className="text-2xl font-bold tracking-tight">
-                    {loading ? "—" : internships.length}
+                    {loading ? "—" : pagination.totalInternships}
                   </p>
                   <p className="text-sm text-slate-500">Available listings</p>
                 </div>
@@ -243,20 +256,7 @@ const [pagination, setPagination] = useState(null);
               </label>
 
               <div className="grid grid-cols-2 gap-3 sm:flex">
-                <label className="relative">
-                  <span className="sr-only">Filter by domain</span>
-                  <select
-                    value={domain}
-                    onChange={(event) => setDomain(event.target.value)}
-                    className="h-full min-h-12 w-full appearance-none rounded-xl border border-slate-200 bg-white py-3 pl-3 pr-9 text-sm font-medium text-slate-700 outline-none transition hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 sm:min-w-40 sm:pl-4"
-                  >
-                    <option value="all">All domains</option>
-                    {domains.map((item) => (
-                      <option key={item} value={item}>{item}</option>
-                    ))}
-                  </select>
-                  <ChevronDown size={15} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                </label>
+                
 
                 <label className="relative">
                   <span className="sr-only">Filter by work mode</span>
@@ -313,7 +313,7 @@ const [pagination, setPagination] = useState(null);
                   "Finding opportunities…"
                 ) : (
                   <>
-                    <span className="font-semibold text-slate-900">{filteredInternships.length}</span>{" "}
+                    <span className="font-semibold text-slate-900">{pagination.totalInternships}</span>{" "}
                     {filteredInternships.length === 1 ? "opportunity" : "opportunities"}
                     {hasFilters ? " match your filters" : " to explore"}
                   </>
